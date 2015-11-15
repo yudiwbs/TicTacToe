@@ -5,6 +5,9 @@ import java.util.InputMismatchException;
 
 /**
  * Created by yudiwbs on 11/12/2015.
+ *
+ *  menyimpan board, player pada board, evaluasi posisi dst.
+ *
  */
 public class Board {
     private int vCurrentPlayer=1;
@@ -21,8 +24,67 @@ public class Board {
 
      */
 
+    public ArrayList<Integer> getMoves() {
+        //mengembalikan move yang mungkin
+        //idx state yang statenya masih 0 (belum terisi 1 atau -1)
+        //init board
+        ArrayList<Integer> out = new ArrayList<>();
+        for (int i:state) {
+            if (state[i]==0) {
+                out.add(i);
+            }
+        }
+        return out;
+    }
 
+
+    //constructor
+    public Board() {
+        //init board
+        for (int i:state) {
+            state[i]=0;
+        }
+    }
+
+    public boolean isGameOver() {
+        return vIsGameOver;
+    }
+
+    public int currentPlayer() {
+        return vCurrentPlayer;
+    }
+
+
+    public void copyTo(Board b) {
+        //isi this.state ke b.state
+        for (int i:state) {
+            b.state[i]=this.state[i];
+        }
+    }
+
+    /*move:
+
+      0  1  2
+      3  4  5
+      6  7  8
+
+     */
+
+    //menghasilkan board yang isinya copy dari board ini, ditambah dengan move
+    //current player juga diganti di board yang baru
+    public Board  makeMove(int m) {
+        Board out = new Board();
+        this.copyTo(out);    //copy state board ini ke board yang baru
+        out.state[m]       =  this.currentPlayer();  //gerakan player
+        out.vCurrentPlayer = -this.currentPlayer();  //gantian
+        return out;
+    }
+
+
+    //harusnya ada cara yg lebih efisien,
+    //percoban tanpa lihat internet :)
     public int evaluasi (int player) {
+
         int skor=0;
 
         //kondisi menang dan skor maksimal
@@ -158,7 +220,7 @@ public class Board {
 
             )
         {
-            skor = 1000;
+            skor = skor +  1000;
             vIsGameOver = true;
         }
 
@@ -169,7 +231,7 @@ public class Board {
                 ((state[2]==player) && (state[5]==player) && (state[8]==player))
            )
         {
-            skor = 1000;
+            skor = skor + 1000;
             vIsGameOver = true;
         }
 
@@ -179,7 +241,7 @@ public class Board {
                 ((state[2]==player) && (state[4]==player) && (state[6]==player))
                 )
         {
-            skor = 1000;
+            skor = skor +  1000;
             vIsGameOver = true;
         }
 
@@ -233,7 +295,7 @@ public class Board {
                     ((state[2]== -player) && (state[5]== -player) && (state[8]==player))
                     )
             {
-                skor = 80;
+                skor = skor +  80;
             }
 
             if (
@@ -242,7 +304,7 @@ public class Board {
                     ((state[2]== -player) && (state[5]== player) && (state[8]== -player))
                     )
             {
-                skor = 80;
+                skor = skor +  80;
             }
 
             if (
@@ -251,7 +313,7 @@ public class Board {
                      ((state[2] == player) && (state[5]== -player) && (state[8]== -player))
                     )
             {
-                skor = 80;
+                skor = skor + 80;
             }
 
             /*  idx: diagonal, blocking lawan
@@ -264,7 +326,7 @@ public class Board {
                     ((state[2]== -player) && (state[4]== -player) && (state[6]==player))
                     )
             {
-                skor = 80;
+                skor = skor + 80;
             }
 
             if (
@@ -272,7 +334,7 @@ public class Board {
                     ((state[2]== -player) && (state[4]== player) && (state[6]== -player))
                     )
             {
-                skor = 80;
+                skor =skor +  80;
             }
 
             if (
@@ -280,7 +342,7 @@ public class Board {
                     ((state[2]== player) && (state[4]== -player) && (state[6]== -player))
                     )
             {
-                skor = 80;
+                skor =skor +  80;
             }
 
 
@@ -339,7 +401,7 @@ public class Board {
                      ((state[2]== player) && (state[5]== player) && (state[8]==0))
                 )
             {
-                skor = 30;
+                skor = skor + 30;
             }
 
             if (
@@ -348,7 +410,7 @@ public class Board {
                     ((state[2]== 0) && (state[5]== player) && (state[8]== player))
                 )
             {
-                skor = 30;
+                skor = skor +  30;
             }
 
             if (
@@ -357,7 +419,7 @@ public class Board {
                     ((state[2] == player) && (state[5]== 0) && (state[8]== player))
                     )
             {
-                skor = 50;
+                skor = skor + 50;
             }
 
             /*  idx: diagonal
@@ -374,7 +436,7 @@ public class Board {
                     ((state[2]== player) && (state[4]== player) && (state[6]==0))
                     )
             {
-                skor = 30;
+                skor = skor +  30;
             }
 
             if (
@@ -382,7 +444,7 @@ public class Board {
                     ((state[2]== player) && (state[4]== 0) && (state[6]== player))
                     )
             {
-                skor = 50; //lebih besar menjepit
+                skor = skor +  50; //lebih besar menjepit
             }
 
             if (
@@ -390,41 +452,13 @@ public class Board {
                     ((state[2]== 0) && (state[4]== player) && (state[6]== player))
                 )
             {
-                skor = 30;
+                skor = skor +  30;
             }
         }  //if !gameover
         return skor;
     }
 
-    public boolean isGameOver() {
-        return vIsGameOver;
-    }
 
-    public int currentPlayer() {
-        return vCurrentPlayer;
-    }
-
-    /*move:
-
-      0  1  2
-      3  4  5
-      6  7  8
-
-     */
-
-    public void makeMove(int m) {
-        state[m] =  vCurrentPlayer;
-        vCurrentPlayer = -vCurrentPlayer;  //ganti player
-    }
-
-    public ArrayList<Integer> getMoves() {
-    /*
-        menghasilkan move yang mungkin
-    */
-
-        ArrayList<Integer> temp  = new ArrayList<>();
-        return temp;
-    }
 
 
 }
