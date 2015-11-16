@@ -1,6 +1,7 @@
 package cs.upi.edu.yudiwbs.gameprog;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Created by yudiwbs on 11/12/2015.
@@ -37,8 +38,8 @@ public class MiniMaxing {
             for (int move:alMoves) {
                 Board newBoard = mBoard.makeMove(move);  //buat board yg baru, isinya sama dgn yg lama + move
 
-                System.out.println("debug new board:");
-                newBoard.print();
+                //System.out.println("debug new board:");
+                //newBoard.print();
 
                 //currentScore, currentMove = minimax(newBoard, player,20 maxDepth, currentDepth+1)
                 MoveScore currentMS = minimax(newBoard,player,currentDepth+1); //rekursif
@@ -76,14 +77,38 @@ public class MiniMaxing {
     public static void main(String[] args) {
         MiniMaxing mm = new MiniMaxing();
         Board b = new Board();
-        b.setCurrentPlayer(1);
 
+        /*
+        //debug satu langkah
+        b.setCurrentPlayer(1);
         b = b.makeMove(4);  //debug  player 1 main
         b.print();
-
         MoveScore ms = mm.getBestMove(b,1);
         ms.print();
         System.out.println("selesai");
+        */
+
+        b.setCurrentPlayer(1);
+        Scanner keyboard = new Scanner(System.in);
+        while (!b.isGameOver()) {
+            b.print();
+            System.out.println("Langkah anda ?");
+            System.out.println("0  1  2");
+            System.out.println("3  4  5");
+            System.out.println("6  7  8");
+            int pil = keyboard.nextInt();
+            System.out.println("Pilihan anda"+pil);
+            b = b.makeMove(pil);  //player gerak . Hati2 memory leaak, pastikan tdk ada ref ke b yg lama
+            b.print();
+            if (!b.isGameOver()) {
+                System.out.println("giliran komputer..");
+                MoveScore ms = mm.getBestMove(b, -1);
+                System.out.println("Pilihan komputer.." + ms.move);
+                b = b.makeMove(ms.move);  //komputer gerak4
+                b.print();
+            }
+            //todo: ada pengecekan, tidak boleh melangkah di tempat yang sudah ditempati
+        }
     }
 
 }
