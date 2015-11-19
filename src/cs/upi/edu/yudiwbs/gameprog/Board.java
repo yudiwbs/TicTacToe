@@ -8,6 +8,8 @@ import java.util.InputMismatchException;
  *
  *  menyimpan board, player pada board, evaluasi posisi dst.
  *
+ *
+ *
  */
 public class Board {
     private int vCurrentPlayer=1;
@@ -24,12 +26,25 @@ public class Board {
 
      */
 
+
+    public void setCurrentPlayer(int cp) {
+        vCurrentPlayer = cp;
+    }
+
+    public void print() {  //untuk debug, print board
+      System.out.println(); //spasi
+      for (int i=0; i<9; i=i+3) {
+          System.out.println(String.format("%3d%3d%3d",state[i],state[i+1],state[i+2]) );
+      }
+      System.out.println();
+    }
+
     public ArrayList<Integer> getMoves() {
         //mengembalikan move yang mungkin
         //idx state yang statenya masih 0 (belum terisi 1 atau -1)
         //init board
         ArrayList<Integer> out = new ArrayList<>();
-        for (int i:state) {
+        for (int i=0;i<9;i++) {
             if (state[i]==0) {
                 out.add(i);
             }
@@ -57,7 +72,7 @@ public class Board {
 
     public void copyTo(Board b) {
         //isi this.state ke b.state
-        for (int i:state) {
+        for (int i=0;i<9;i++) {
             b.state[i]=this.state[i];
         }
     }
@@ -72,11 +87,61 @@ public class Board {
 
     //menghasilkan board yang isinya copy dari board ini, ditambah dengan move
     //current player juga diganti di board yang baru
+    //penting: deteksi jika game berakhir
     public Board  makeMove(int m) {
         Board out = new Board();
         this.copyTo(out);    //copy state board ini ke board yang baru
         out.state[m]       =  this.currentPlayer();  //gerakan player
         out.vCurrentPlayer = -this.currentPlayer();  //gantian
+
+        //System.out.println("debug makemove");
+        //out.print();
+
+        //cek apakah game over, sudah tidak ada langkah lagi, cara yg lebih efisien mungkin pake variabel, tapi untuk sementara ok lah
+
+
+        int player = this.currentPlayer();
+        //cek kondisi menang
+        if (
+                ((out.state[0]==player) && (out.state[1]==player) && (out.state[2]==player)) ||
+                ((out.state[3]==player) && (out.state[4]==player) && (out.state[5]==player)) ||
+                ((out.state[6]==player) && (out.state[7]==player) && (out.state[8]==player))
+                )
+        {
+            out.vIsGameOver = true;
+        }
+
+        //vertical
+        if (
+                ((out.state[0]==player) && (out.state[3]==player) && (out.state[6]==player)) ||
+                ((out.state[1]==player) && (out.state[4]==player) && (out.state[7]==player)) ||
+                ((out.state[2]==player) && (out.state[5]==player) && (out.state[8]==player))
+                )
+        {
+            out.vIsGameOver = true;
+        }
+
+        //diagonal
+        if (
+                ((out.state[0]==player) && (out.state[4]==player) && (out.state[8]==player)) ||
+                ((out.state[2]==player) && (out.state[4]==player) && (out.state[6]==player))
+                )
+        {
+            out.vIsGameOver = true;
+        }
+
+        boolean masihAdaLangkah=false;
+        for (int i=0;i<9;i++) {
+            if (out.state[i]==0) {
+
+                masihAdaLangkah = true;
+                break;
+            }
+        }
+        if (!masihAdaLangkah) {
+            out.vIsGameOver = true;
+        }
+
         return out;
     }
 
@@ -221,7 +286,7 @@ public class Board {
             )
         {
             skor = skor +  1000;
-            vIsGameOver = true;
+
         }
 
         //vertical
@@ -232,7 +297,6 @@ public class Board {
            )
         {
             skor = skor + 1000;
-            vIsGameOver = true;
         }
 
         //diagonal
@@ -242,16 +306,14 @@ public class Board {
                 )
         {
             skor = skor +  1000;
-            vIsGameOver = true;
         }
 
 
-        if  (!vIsGameOver)
-        {
-            //==========================> prioritas kedua, blokir lawan yang mau menang
+
+            //==========================> kondisi tidak menguntungkan, ada dua biji lawan berurutan
 
             //horizontal
-            //idx: horizontal, blocking lawan
+            //idx: horizontal,  lawan
             /*
                 -0, -1, 2 >> -0,1,-2 >> 0, -1, -2
                 -3, -4, 5 >> -3,4,-5 >> 3 ,-4, -5
@@ -263,28 +325,28 @@ public class Board {
                  ((state[6] == -player) && (state[7]== -player) && (state[8]==player))
                     )
             {
-                skor = skor + 80;
+                skor = skor + 150;
             }
-            //baris 2
+
             if (
                     ((state[0] == -player) && (state[1]== player)  && (state[2]== -player)) ||
                     ((state[3] == -player) && (state[4]== player)  && (state[5]== -player)) ||
                     ((state[6] == -player) && (state[7]== player)  && (state[8]== -player))
                     )
             {
-                skor = skor + 80;
+                skor = skor + 150;
             }
-            //baris3
+
             if (
                     ((state[0]  == player) && (state[1]== -player)  && (state[2]== -player)) ||
                      ((state[3] == player) && (state[4]== -player)  && (state[5]== -player)) ||
                      ((state[6] == player) && (state[7]== -player)  && (state[8]== -player))
                     )
             {
-                skor = skor + 80;
+                skor = skor + 150;
             }
 
-            //idx: vertikal, blocking lawan
+            //idx: vertikal,
             //-0,-3,6   >> -0,3,-6    >> 0,-3,-6
             //-1,-4,7   >> -1,4,-7    >> 1,-4,-7
             //-2,-5,8   >> -2,5,-8    >> 2,-5,-8
@@ -295,7 +357,7 @@ public class Board {
                     ((state[2]== -player) && (state[5]== -player) && (state[8]==player))
                     )
             {
-                skor = skor +  80;
+                skor = skor + 150;
             }
 
             if (
@@ -304,7 +366,7 @@ public class Board {
                     ((state[2]== -player) && (state[5]== player) && (state[8]== -player))
                     )
             {
-                skor = skor +  80;
+                skor = skor + 150;
             }
 
             if (
@@ -313,7 +375,7 @@ public class Board {
                      ((state[2] == player) && (state[5]== -player) && (state[8]== -player))
                     )
             {
-                skor = skor + 80;
+                skor = skor + 150;
             }
 
             /*  idx: diagonal, blocking lawan
@@ -326,7 +388,7 @@ public class Board {
                     ((state[2]== -player) && (state[4]== -player) && (state[6]==player))
                     )
             {
-                skor = skor + 80;
+                skor = skor + 150;
             }
 
             if (
@@ -334,7 +396,7 @@ public class Board {
                     ((state[2]== -player) && (state[4]== player) && (state[6]== -player))
                     )
             {
-                skor =skor +  80;
+                skor =skor + 150;
             }
 
             if (
@@ -342,11 +404,11 @@ public class Board {
                     ((state[2]== player) && (state[4]== -player) && (state[6]== -player))
                     )
             {
-                skor =skor +  80;
+                skor =skor + 150;
             }
 
 
-            //==========================> prioritas ketiga, serang (dua biji)
+            //==========================> posisi menguntungkan, (dua biji berurutan)
 
             //horizontal
             /*
@@ -454,7 +516,6 @@ public class Board {
             {
                 skor = skor +  30;
             }
-        }  //if !gameover
         return skor;
     }
 

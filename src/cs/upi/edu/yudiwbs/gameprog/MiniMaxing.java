@@ -38,8 +38,8 @@ public class MiniMaxing {
             for (int move:alMoves) {
                 Board newBoard = mBoard.makeMove(move);  //buat board yg baru, isinya sama dgn yg lama + move
 
-                //System.out.println("debug new board:");
-                //newBoard.print();
+                System.out.println("debug new board:");
+                newBoard.print();
 
                 //currentScore, currentMove = minimax(newBoard, player,20 maxDepth, currentDepth+1)
                 MoveScore currentMS = minimax(newBoard,player,currentDepth+1); //rekursif
