@@ -8,7 +8,8 @@ import java.util.InputMismatchException;
  *
  *  menyimpan board, player pada board, evaluasi posisi dst.
  *
- *
+ * todo: evaluasinya masih sangat tidak efisien, ternyata dengan rumus bisa, googling saja
+ *       ini saya buat dengan mencoba tidak googling :)
  *
  */
 public class Board {
@@ -72,9 +73,7 @@ public class Board {
 
     public void copyTo(Board b) {
         //isi this.state ke b.state
-        for (int i=0;i<9;i++) {
-            b.state[i]=this.state[i];
-        }
+        System.arraycopy(this.state, 0, b.state, 0, 9);
     }
 
     /*move:
